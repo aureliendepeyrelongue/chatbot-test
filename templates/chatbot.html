@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+
+    <title>Chatbot IT - accueil</title>
+    {% include 'fragments/links.html' %}
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    {% include 'fragments/navbar.html' %}
+    <div class="container" id="app">
+        <div class="section">
+            <h3>Entammez une discussion</h3>
+            <div class="row">
+                <div class="col s12">
+                    <div id="chat">
+                        <div class="scroll">
+                            <div class="row">
+                                <div class="col s6">
+                                    <div id="content-scroll" style="
+                        overflow-y: scroll;
+                        height: 400px;
+                        box-sizing: content-box;
+                        padding: 10px;
+                        scrollbar-width: none;
+                      ">
+                                        <div v-for="(message,index) in messages" class="row">
+                                            <div class="col s12">
+                                                <div class="card darken-1" :class="[getMessageColor(message.from),getMessageDirection(message.from)]">
+                                                    <div class="card-content white-text">
+                                                        <span class="card-title">[[message.from]]</span>
+                                                        <p>[[message.content]]</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="target" ref="target"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <input v-on:keyup.enter="sendMessage" v-model="userMessage" placeholder="j'ai une question..." id="first_name2" type="text" class="validate" />
+                                    <label class="active" for="first_name2">Votre message</label
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% include 'fragments/footer.html' %}
+
+    <!--  Scripts-->
+    {% include 'fragments/scripts.html' %}
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script>
+      AOS.init();
+    </script>
+    <script type="">
+      var chat = new Vue({
+        delimiters: ["[[", "]]"],
+        el: "#app",
+        data: {
+          userMessage: "",
+          messages: [
+            {
+              from: "chatbot",
+              content:
+                "Bonjour bienvenue dans la discussion ! Que puis-je faire pour vous ?",
+            },
+          ],
+        },
+        computed: {},
+
+        methods: {
+          getMessageColor(author) {
+            return author == "chatbot" ? "blue" : "teal";
+          },
+          getMessageDirection(author) {
+            return author == "chatbot" ? "left" : "right";
+          },
+          getMessageImage(author) {
+            return author == "chatbot" ? "blue" : "teal";
+          },
+          sendMessage() {
+            axios
+              .get("/get", {
+                params: {
+                  msg: this.userMessage,
+                },
+              })
+              .then((response) => {
+                this.messages.push({ from: "user", content: this.userMessage });
+                this.userMessage = "";
+
+                setTimeout(() => {
+                  this.messages.push({
+                    from: "chatbot",
+                    content: response.data,
+                  });
+                }, 300);
+              });
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
